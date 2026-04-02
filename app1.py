@@ -405,52 +405,49 @@ elif page == "Upload & Explore Data":
 
     file = st.file_uploader("Upload CSV", type=["csv"])
 
+    file = st.file_uploader("Upload CSV", type=["csv"])
+
     if file:
         df = pd.read_csv(file)
-        
-        # global cleaning to remove empty blocks
+
+        # cleaning
         df = df.replace(r'^\s*$', np.nan, regex=True)
         df = df.dropna()
-        
+
         st.dataframe(df.head())
 
+        # 👉 FILTER STARTS HERE (IMPORTANT)
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
-        col = st.sidebar.selectbox("Filter Column", df.columns)
+        if df[col].dtype != "object":
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+            clean_df = df.dropna(subset=[col])
 
-    if df[col].dtype != "object":
-        # Convert to numeric safely
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-
-        # Drop NaNs only for this column
-        clean_df = df.dropna(subset=[col])
-
-        # Handle empty column
-        if clean_df.empty:
-            st.warning(f"No valid numeric data in column '{col}'")
-            filtered_df = df.iloc[0:0]
-        else:
-            min_val = float(clean_df[col].min())
-            max_val = float(clean_df[col].max())
-
-            # Handle NaN edge case
-            if np.isnan(min_val) or np.isnan(max_val):
-                st.warning(f"Invalid values in column '{col}'")
+            if clean_df.empty:
+                st.warning(f"No valid numeric data in column '{col}'")
                 filtered_df = df.iloc[0:0]
-
-            elif min_val == max_val:
-                val = st.sidebar.number_input("Value", value=min_val)
-                filtered_df = clean_df[clean_df[col] == val]
-
             else:
-                val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
-                filtered_df = clean_df[
-                    (clean_df[col] >= val[0]) & (clean_df[col] <= val[1])
-            ]
-    else:
-        val = st.sidebar.selectbox("Value", df[col].unique())
-        filtered_df = df[df[col] == val]
+                min_val = float(clean_df[col].min())
+                max_val = float(clean_df[col].max())
 
+                if np.isnan(min_val) or np.isnan(max_val):
+                    st.warning(f"Invalid values in column '{col}'")
+                    filtered_df = df.iloc[0:0]
+
+                elif min_val == max_val:
+                    val = st.sidebar.number_input("Value", value=min_val)
+                    filtered_df = clean_df[clean_df[col] == val]
+
+                else:
+                    val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
+                    filtered_df = clean_df[
+                        (clean_df[col] >= val[0]) & (clean_df[col] <= val[1])
+                    ]
+        else:
+            val = st.sidebar.selectbox("Value", df[col].unique())
+            filtered_df = df[df[col] == val]
+
+        # 👉 USE filtered_df BELOW
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
 
