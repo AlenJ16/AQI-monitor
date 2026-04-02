@@ -416,20 +416,25 @@ elif page == "Upload & Explore Data":
 
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
-        if df[col].dtype != "object":
+    if df[col].dtype != "object":
+        # 1. Check if the column is empty or all NaNs
+        if df[col].isnull().all() or len(df[col]) == 0:
+            st.sidebar.warning(f"Column '{col}' has no valid data to filter.") 
+            filtered_df = df
+        else:
+            # 2. Safely calculate min and max
             min_val = float(df[col].min())
             max_val = float(df[col].max())
-        
-            # Check if min and max are the same to avoid slider errors
+            
             if min_val == max_val:
-                st.sidebar.warning(f"Column '{col}' only has one value: {min_val}")
+                st.sidebar.info(f"Only one value ({min_val}) found in '{col}'.")
                 filtered_df = df
             else:
                 val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
                 filtered_df = df[(df[col] >= val[0]) & (df[col] <= val[1])]
-        else:
-            val = st.sidebar.selectbox("Value", df[col].unique())
-            filtered_df = df[df[col] == val] 
+    else:
+        val = st.sidebar.selectbox("Value", df[col].unique())
+        filtered_df = df[df[col] == val] 
 
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
