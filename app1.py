@@ -416,21 +416,40 @@ elif page == "Upload & Explore Data":
 
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
-        if df[col].dtype != "object":
-            # Convert safely to numeric
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-                df = df.dropna(subset=[col])
+        col = st.sidebar.selectbox("Filter Column", df.columns)
 
-        min_val = float(df[col].min())
-        max_val = float(df[col].max())
+    if df[col].dtype != "object":
+        # Convert to numeric safely
+        df[col] = pd.to_numeric(df[col], errors='coerce')
 
-        # Handle edge case (same values)
-        if min_val == max_val:
-                val = st.sidebar.number_input("Value", value=min_val)
-                filtered_df = df[df[col] == val]
+        # Drop NaNs only for this column
+        clean_df = df.dropna(subset=[col])
+
+        # Handle empty column
+        if clean_df.empty:
+            st.warning(f"No valid numeric data in column '{col}'")
+            filtered_df = df.iloc[0:0]
         else:
+            min_val = float(clean_df[col].min())
+            max_val = float(clean_df[col].max())
+
+            # Handle NaN edge case
+            if np.isnan(min_val) or np.isnan(max_val):
+                st.warning(f"Invalid values in column '{col}'")
+                filtered_df = df.iloc[0:0]
+
+            elif min_val == max_val:
+                val = st.sidebar.number_input("Value", value=min_val)
+                filtered_df = clean_df[clean_df[col] == val]
+
+            else:
                 val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
-                filtered_df = df[(df[col] >= val[0]) & (df[col] <= val[1])]
+                filtered_df = clean_df[
+                    (clean_df[col] >= val[0]) & (clean_df[col] <= val[1])
+            ]
+    else:
+        val = st.sidebar.selectbox("Value", df[col].unique())
+        filtered_df = df[df[col] == val]
 
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
