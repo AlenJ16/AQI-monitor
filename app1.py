@@ -417,7 +417,7 @@ elif page == "Upload & Explore Data":
         # 👉 FILTER STARTS HERE (IMPORTANT)
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
-        if df[col].dtype != "object":
+        if pd.api.types.is_numeric_dtype(df[col]):       
             df[col] = pd.to_numeric(df[col], errors='coerce')
             clean_df = df.dropna(subset=[col])
 
