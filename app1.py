@@ -405,8 +405,6 @@ elif page == "Upload & Explore Data":
 
     file = st.file_uploader("Upload CSV", type=["csv"])
 
-    file = st.file_uploader("Upload CSV", type=["csv"])
-
     if file:
         df = pd.read_csv(file)
 
