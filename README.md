@@ -1,67 +1,100 @@
-# Air Quality Index (AQI) Predictor
-# Developed by: Alen John
+# 🌫️ AQI Monitor — AI-Powered Air Quality Prediction
 
-1. PROJECT OVERVIEW
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)
+![Machine Learning](https://img.shields.io/badge/ML-Ensemble%20Learning-green?logo=scikit-learn&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
-Monitoring air quality is crucial for public health. This project focuses on 
-building a robust Machine Learning regression model that interprets complex 
-pollutant data (PM2.5, PM10, NO2, SO2, CO, O3) to provide a standardized 
-AQI value.
+> 🔬 An AI-powered Air Quality Index (AQI) prediction system built using advanced machine learning models and deployed through an interactive **Streamlit** web application for real-time environmental analysis.
 
-The core of this project is a Voting Regressor ensemble that aggregates the 
-strengths of multiple models (including Random Forest and XGBoost) to ensure 
-prediction stability and high accuracy.
+## 📊 Dataset Used
+The model is trained on historical environmental data from India (2015-2024):
+**Dataset:** [Air Quality Data in India (Kaggle)](https://www.kaggle.com/datasets/ankushpanday1/air-quality-data-in-india-2015-2024)
 
+---
 
-2. MODEL PERFORMANCE
+## 🧠 About the Project
 
-The final ensemble model was evaluated using standard regression metrics:
+**AQI Monitor** is an end-to-end machine learning project designed to predict the Air Quality Index (AQI) using key environmental pollutant data such as **PM2.5, PM10, NO2, SO2, CO, and O₃**.
 
-* R-Squared (R2) Score: 0.934  (Explains 93.4% of data variance)
-* Mean Absolute Error (MAE): 15.97
-* Root Mean Squared Error (RMSE): 26.78
+The project evaluates multiple machine learning models—specifically focusing on **Random Forest Regression** and advanced ensemble techniques—to achieve high prediction accuracy. The final model is deployed in a user-friendly dashboard where users can explore data visually and predict AQI in real-time.
 
-These metrics confirm that the "Voting" approach successfully minimizes 
-prediction errors compared to individual standalone models.
+---
 
+## ✨ Features
 
-3. KEY FEATURES
+- ✅ **Multiple ML Models:** Trained and evaluated various regression algorithms.
+- ✅ **Interactive Dashboard:** Built with **Streamlit** for a modern, responsive UI.
+- ✅ **Real-time Prediction:** Two-column input system for instant AQI results.
+- ✅ **Visual Analytics:** Includes histograms, scatter plots, and correlation heatmaps.
+- ✅ **Live Logging System:** A dedicated page to monitor model loading and system activity.
+- ✅ **Professional Architecture:** Designed with clear DFD and ER diagrams.
 
-* Interactive UI: Built with Streamlit, allowing users to input pollutant 
-  levels via sliders or text boxes for real-time results.
-* Ensemble Learning: Uses a Voting Regressor to balance bias and variance.
-* Automated Logging: A built-in system records every prediction with a 
-  timestamp, log level (INFO/SUCCESS/ERROR), and model details.
-* Data Visualization: Integrated gauges and charts within the dashboard 
-  to visualize the predicted AQI level.
+---
 
+## 🤖 ML Models Used
 
-4. TECH STACK
+| # | Model | Type |
+|---|-------|------|
+| 1 | Linear Regression | Linear |
+| 2 | Polynomial Regression | Linear |
+| 3 | Decision Tree | Tree-based |
+| 4 | **Random Forest** | **Ensemble (Primary)** |
+| 5 | Gradient Boosting | Ensemble |
+| 6 | **XGBoost** | Boosting |
+| 7 | **LightGBM** | Boosting |
+| 8 | **Stacking Regressor** | Ensemble |
+| 9 | **Voting Regressor** | Final Ensemble Model |
 
-* Language: Python 3.8+
-* Machine Learning: Scikit-Learn, XGBoost, LightGBM
-* Web Framework: Streamlit
-* Data Handling: Pandas, NumPy
-* Logging: Python Logging Module
+---
 
+## 📊 Model Performance
 
-5. PROJECT STRUCTURE
+- **Best Model:** Voting Regressor
+- **R² Score:** 0.934
+- **RMSE:** 26.78
+- **MAE:** 15.97
 
-├── app.py              # Main Streamlit application script
-├── model.py            # ML Pipeline & Voting Regressor logic
-├── requirements.txt    # Python dependencies
-├── logs/               # Directory for generated system logs
-└── data/               # Source Kaggle dataset
+---
 
+## 🎬 Demo
 
-6. HOW TO RUN
+🚀 **Live App:** [AQI Monitor Dashboard](https://aqi-monitor-alenjohn.streamlit.app/)
 
-1. Install dependencies:
-   pip install -r requirements.txt
+---
 
-2. Launch the dashboard:
-   streamlit run app.py
+## 🛠️ Tech Stack
 
+| Tool | Purpose |
+|------|---------|
+| **Python** | Core programming |
+| **Streamlit** | Web application framework |
+| **Scikit-learn** | ML training & Random Forest |
+| **XGBoost / LightGBM** | Advanced Boosting Models |
+| **Pandas / NumPy** | Data handling & cleaning |
+| **Matplotlib / Plotly** | Data visualization |
+| **Pickle / Joblib** | Model serialization |
 
-Note: This project was developed as a college presentation to demonstrate 
-the practical application of Ensemble Learning and End-to-End ML deployment.
+---
+
+## 📂 Project Workflow
+
+| Step | Action | Output |
+|------|--------|--------|
+| 1 | Data preprocessing & cleaning | Clean Kaggle dataset |
+| 2 | System Architecture Design | ER & Data Flow Diagrams |
+| 3 | Model Training & Tuning | Optimized Random Forest |
+| 4 | UI Development | Streamlit Dashboard |
+| 5 | System Integration | Live Logging & Prediction |
+
+---
+
+## 👨‍💻 Author
+
+**Alen John**
+* College Project — Machine Learning Track
+* Focus: System Management & Architecture
+
+---
+
+<p align="center">Made with ❤️ and Python | ⭐ Star this repo if you found it useful!</p>
