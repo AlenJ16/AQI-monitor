@@ -417,11 +417,20 @@ elif page == "Upload & Explore Data":
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
         if df[col].dtype != "object":
-            val = st.sidebar.slider("Range", float(df[col].min()), float(df[col].max()))
-            filtered_df = df[df[col] >= val]
+            # Convert safely to numeric
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+                df = df.dropna(subset=[col])
+
+        min_val = float(df[col].min())
+        max_val = float(df[col].max())
+
+        # Handle edge case (same values)
+        if min_val == max_val:
+                val = st.sidebar.number_input("Value", value=min_val)
+                filtered_df = df[df[col] == val]
         else:
-            val = st.sidebar.selectbox("Value", df[col].unique())
-            filtered_df = df[df[col] == val]
+                val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
+                filtered_df = df[(df[col] >= val[0]) & (df[col] <= val[1])]
 
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
