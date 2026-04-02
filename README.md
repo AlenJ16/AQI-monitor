@@ -5,15 +5,15 @@
 ![Machine Learning](https://img.shields.io/badge/ML-Ensemble%20Learning-green?logo=scikit-learn&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
-> 🔬 An AI-powered Air Quality Index (AQI) prediction system built using advanced machine learning models and deployed through an interactive **Streamlit** web application for real-time environmental analysis.
+>  An AI-powered Air Quality Index (AQI) prediction system built using advanced machine learning models and deployed through an interactive **Streamlit** web application for real-time environmental analysis.
 
-## 📊 Dataset Used
+##  Dataset Used
 The model is trained on historical environmental data from India (2015-2024):
 **Dataset:** [Air Quality Data in India (Kaggle)](https://www.kaggle.com/datasets/ankushpanday1/air-quality-data-in-india-2015-2024)
 
 ---
 
-## 🧠 About the Project
+##  About the Project
 
 **AQI Monitor** is an end-to-end machine learning project designed to predict the Air Quality Index (AQI) using key environmental pollutant data such as **PM2.5, PM10, NO2, SO2, CO, and O₃**.
 
@@ -21,18 +21,18 @@ The project evaluates multiple machine learning models—specifically focusing o
 
 ---
 
-## ✨ Features
+##  Features
 
-- ✅ **Multiple ML Models:** Trained and evaluated various regression algorithms.
-- ✅ **Interactive Dashboard:** Built with **Streamlit** for a modern, responsive UI.
-- ✅ **Real-time Prediction:** Two-column input system for instant AQI results.
-- ✅ **Visual Analytics:** Includes histograms, scatter plots, and correlation heatmaps.
-- ✅ **Live Logging System:** A dedicated page to monitor model loading and system activity.
-- ✅ **Professional Architecture:** Designed with clear DFD and ER diagrams.
+-  **Multiple ML Models:** Trained and evaluated various regression algorithms.
+-  **Interactive Dashboard:** Built with **Streamlit** for a modern, responsive UI.
+-  **Real-time Prediction:** Two-column input system for instant AQI results.
+-  **Visual Analytics:** Includes histograms, scatter plots, and correlation heatmaps.
+-  **Live Logging System:** A dedicated page to monitor model loading and system activity.
+-  **Professional Architecture:** Designed with clear DFD and ER diagrams.
 
 ---
 
-## 🤖 ML Models Used
+##  ML Models Used
 
 | # | Model | Type |
 |---|-------|------|
@@ -57,13 +57,13 @@ The project evaluates multiple machine learning models—specifically focusing o
 
 ---
 
-## 🎬 Demo
+##  Demo
 
-🚀 **Live App:** [AQI Monitor Dashboard](https://aqi-monitor-alenjohn.streamlit.app/)
+ **Live App:** [AQI Monitor Dashboard](https://aqi-monitor-alenjohn.streamlit.app/)
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Tool | Purpose |
 |------|---------|
@@ -77,7 +77,7 @@ The project evaluates multiple machine learning models—specifically focusing o
 
 ---
 
-## 📂 Project Workflow
+##  Project Workflow
 
 | Step | Action | Output |
 |------|--------|--------|
@@ -89,7 +89,7 @@ The project evaluates multiple machine learning models—specifically focusing o
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Alen John**
 * College Project — Machine Learning Track
@@ -97,4 +97,4 @@ The project evaluates multiple machine learning models—specifically focusing o
 
 ---
 
-<p align="center">Made with ❤️ and Python | ⭐ Star this repo if you found it useful!</p>
+<p align="center">Made with and Python | Star this repo if you found it useful!</p>
