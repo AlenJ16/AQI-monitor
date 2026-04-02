@@ -416,25 +416,39 @@ elif page == "Upload & Explore Data":
 
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
-    if df[col].dtype != "object":
-        # 1. Check if the column is empty or all NaNs
-        if df[col].isnull().all() or len(df[col]) == 0:
-            st.sidebar.warning(f"Column '{col}' has no valid data to filter.") 
-            filtered_df = df
-        else:
-            # 2. Safely calculate min and max
-            min_val = float(df[col].min())
-            max_val = float(df[col].max())
-            
-            if min_val == max_val:
-                st.sidebar.info(f"Only one value ({min_val}) found in '{col}'.")
+    # Assuming 'df' was defined above after st.file_uploader
+    if 'df' in locals() or 'df' in globals():
+        # Only show the filter if a file is actually uploaded
+        col = st.sidebar.selectbox("Filter Column", df.columns)
+        
+        # Check if the column is actually numeric (int or float)
+        if pd.api.types.is_numeric_dtype(df[col]):
+            # 1. Check if the column is empty or all NaNs
+            if df[col].isnull().all() or len(df[col]) == 0:
+                st.sidebar.warning(f"Column '{col}' has no valid data to filter.")
                 filtered_df = df
             else:
-                val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
-                filtered_df = df[(df[col] >= val[0]) & (df[col] <= val[1])]
+                # 2. Safely calculate min and max
+                min_val = float(df[col].min())
+                max_val = float(df[col].max())
+                
+                if min_val == max_val:
+                    st.sidebar.info(f"Only one value ({min_val}) found in '{col}'.")
+                    filtered_df = df
+                else:
+                    # Use a range slider (two handles) for better filtering
+                    val = st.sidebar.slider(f"Filter {col} Range", min_val, max_val, (min_val, max_val))
+                    filtered_df = df[(df[col] >= val[0]) & (df[col] <= val[1])]
+        else:
+            # For non-numeric columns like 'City'
+            options = df[col].unique().tolist()
+            val = st.sidebar.selectbox(f"Select {col}", options)
+            filtered_df = df[df[col] == val]
+        
+        # Now display your filtered dataframe
+        st.write(filtered_df)
     else:
-        val = st.sidebar.selectbox("Value", df[col].unique())
-        filtered_df = df[df[col] == val] 
+        st.info("Please upload a CSV file to see the filter options.")
 
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
