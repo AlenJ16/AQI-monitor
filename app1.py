@@ -237,6 +237,129 @@ hr { border-color: var(--border) !important; }
     border-bottom: 1px solid var(--border);
     margin-bottom: 12px;
 }
+
+/* ── MOBILE RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Tighten main padding */
+    .main .block-container {
+        padding: 0.75rem 0.75rem 2rem 0.75rem !important;
+        max-width: 100% !important;
+    }
+
+    /* Hero banner */
+    div[style*="padding: 36px 32px"] {
+        padding: 24px 16px !important;
+    }
+
+    /* Headings scale down */
+    h1 { font-size: 1.45rem !important; }
+    h2 { font-size: 1.2rem  !important; }
+    h3 { font-size: 1rem    !important; }
+
+    /* Metric cards: make them full-width, smaller text */
+    div[data-testid="stMetric"] {
+        padding: 12px 14px !important;
+    }
+    div[data-testid="stMetricValue"] {
+        font-size: 1.4rem !important;
+    }
+    div[data-testid="stMetricLabel"] p {
+        font-size: 0.68rem !important;
+    }
+
+    /* Columns → single column stack */
+    [data-testid="stHorizontalBlock"] {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Buttons: full-width on mobile */
+    .stButton > button,
+    .stFormSubmitButton > button {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 0.9rem !important;
+    }
+    .stDownloadButton > button {
+        width: 100% !important;
+        padding: 10px 16px !important;
+    }
+
+    /* Inputs: full width */
+    input[type="number"],
+    input[type="text"],
+    .stTextInput input {
+        width: 100% !important;
+        font-size: 1rem !important;
+    }
+
+    /* Selectbox full width */
+    div[data-baseweb="select"] {
+        width: 100% !important;
+    }
+
+    /* File uploader: stack vertically on small screens */
+    [data-testid="stFileUploadDropzone"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 1rem !important;
+        gap: 0.75rem !important;
+    }
+
+    /* DataFrames & tables: horizontal scroll instead of overflow */
+    .stDataFrame, .stTable {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Plotly charts: allow shrinking */
+    .js-plotly-plot, .plotly {
+        width: 100% !important;
+    }
+
+    /* Sidebar: already collapsible in Streamlit; just polish */
+    section[data-testid="stSidebar"] {
+        min-width: 240px !important;
+        max-width: 80vw !important;
+    }
+    section[data-testid="stSidebar"] .stRadio label {
+        padding: 9px 13px !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* Prediction result card */
+    div[style*="border-radius:16px"][style*="padding:28px"] {
+        padding: 18px 14px !important;
+    }
+
+    /* AQI value font on mobile */
+    p[style*="font-size:3.5rem"] {
+        font-size: 2.6rem !important;
+    }
+
+    /* Log panel */
+    div[style*="max-height:280px"] {
+        max-height: 220px !important;
+        font-size: 0.78rem !important;
+    }
+
+    /* Pollutant cards row */
+    div[style*="border-radius:10px"][style*="padding:10px 14px"] {
+        padding: 9px 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.25rem !important; }
+    div[data-testid="stMetricValue"] { font-size: 1.2rem !important; }
+    .main .block-container { padding: 0.5rem 0.5rem 2rem !important; }
+}
 </style>
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
