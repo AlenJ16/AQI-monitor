@@ -240,7 +240,7 @@ hr { border-color: var(--border) !important; }
     margin-bottom: 12px;
 }
 
-/* ── MOBILE RESPONSIVE ─────────────────────────────────────────── */
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
 
     /* Tighten main padding */
@@ -270,7 +270,7 @@ hr { border-color: var(--border) !important; }
         font-size: 0.68rem !important;
     }
 
-    /* Columns → single column stack */
+    /* Columns: single column stack */
     [data-testid="stHorizontalBlock"] {
         flex-direction: column !important;
         gap: 0.5rem !important;
@@ -528,7 +528,7 @@ elif page == "Upload & Explore Data":
         <span class="material-icons" style="color:#5b8dee;font-size:2rem;">upload_file</span>
         Upload &amp; Explore Data</h1>""", unsafe_allow_html=True)
 
-    # ✅ SESSION STATE (IMPORTANT)
+    # ✅ SESSION STATE
     if "uploaded_df" not in st.session_state:
         st.session_state.uploaded_df = None
 
@@ -539,8 +539,26 @@ elif page == "Upload & Explore Data":
     )
 
     drive_link = st.text_input("Or paste Google Drive file link And Press Enter")
+    
+    # Sample Data Button
+    if st.button("Load Sample Dataset"):
+        try:
+            sample_df = pd.read_csv("city_day.csv")
 
-    # 🔧 FIXED DRIVE LINK
+            # take only required columns (important)
+            sample_df = sample_df[['City', 'PM2.5', 'PM10', 'O3', 'NO2', 'CO', 'SO2']]
+
+            # take first 100 rows (or random sample)
+            sample_df = sample_df.dropna().sample(200)
+
+            st.session_state.uploaded_df = sample_df
+
+            st.success("Sample dataset loaded successfully")
+
+        except Exception as e:
+            st.error(f"Error loading sample data: {e}")
+
+    # 🔧 DRIVE LINK
     def convert_drive_link(link):
         import re
 
@@ -557,7 +575,7 @@ elif page == "Upload & Explore Data":
 
         return None
 
-    # -------- FILE UPLOAD --------
+    # FILE UPLOAD
     if file:
         file_type = file.name.split(".")[-1].lower()
 
@@ -575,7 +593,7 @@ elif page == "Upload & Explore Data":
 
         st.success(f"{file_type.upper()} file loaded successfully")
 
-    # -------- GOOGLE DRIVE --------
+    # google drive
     elif drive_link:
         download_link = convert_drive_link(drive_link)
 
@@ -617,12 +635,13 @@ elif page == "Upload & Explore Data":
 
         else:
             st.error("Invalid Google Drive link")
+        
 
-    # -------- MAIN DISPLAY --------
+    # MAIN DISPLAY
     df = st.session_state.uploaded_df
 
     if df is None:
-        st.info("Upload a file or paste a Google Drive link to begin.")
+        st.info("Upload a file or can view a sample data or paste a Google Drive link to begin.")
     
     elif df is not None:
 
@@ -739,9 +758,7 @@ elif page == "Upload & Explore Data":
         else:
             st.warning("Need at least 2 numeric columns for correlation.")
             
-        # =========================
-        # DOWNLOAD ALL CHARTS (ZIP)
-        # =========================
+        # Downloads all chart in a zip
 
         zip_buffer = io.BytesIO()
 
@@ -757,7 +774,7 @@ elif page == "Upload & Explore Data":
                 except:
                     pass
 
-            # Scatter Plot → HTML
+            # Scatter Plot: HTML
             if 'scatter_fig' in locals():
                 try:
                     html_bytes = scatter_fig.to_html().encode("utf-8")
@@ -765,7 +782,7 @@ elif page == "Upload & Explore Data":
                 except:
                     pass
 
-            # Heatmap → HTML
+            # Heatmap: HTML
             if 'heatmap_fig' in locals():
                 try:
                     html_bytes = heatmap_fig.to_html().encode("utf-8")
