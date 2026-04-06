@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 import datetime
+import zipfile
+import io
 
 # page config 
 st.set_page_config(page_title="AQI Monitor", layout="wide", page_icon="🌫")
@@ -657,6 +659,16 @@ elif page == "Upload & Explore Data":
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
         
+        # Download filtered data
+        csv = filtered_df.to_csv(index=False).encode('utf-8')
+
+        st.download_button(
+            label="Download Filtered Data as CSV",
+            data=csv,
+            file_name="filtered_data.csv",
+            mime="text/csv"
+        )
+        
         num_cols = filtered_df.select_dtypes(include=np.number).columns
 
         # Histogram
@@ -664,9 +676,9 @@ elif page == "Upload & Explore Data":
             c = st.selectbox("Histogram Column", num_cols)
             clean = filtered_df[c].dropna()
 
-            fig, ax = plt.subplots()
+            hist_fig, ax = plt.subplots()
             ax.hist(clean)
-            st.pyplot(fig)
+            st.pyplot(hist_fig)
 
         # Scatter Plot
         if len(num_cols) >= 2:
@@ -674,8 +686,8 @@ elif page == "Upload & Explore Data":
             y = st.selectbox("Y", [i for i in num_cols if i != x])
 
             plot_df = filtered_df[[x, y]].dropna()
-            fig = px.scatter(plot_df, x=x, y=y)
-            st.plotly_chart(fig)
+            scatter_fig = px.scatter(plot_df, x=x, y=y)
+            st.plotly_chart(scatter_fig)
 
         # Correlation Heatmap
         st.subheader("Correlation Heatmap")
@@ -686,14 +698,14 @@ elif page == "Upload & Explore Data":
             if corr_df.shape[0] > 1:
                 corr_matrix = corr_df.corr()
 
-                fig_corr = px.imshow(
+                heatmap_fig = px.imshow(
                     corr_matrix,
                     text_auto=True,
                     aspect="auto",
                     color_continuous_scale="RdBu_r",
                     title="Feature Correlation Matrix"
                 )
-                st.plotly_chart(fig_corr)
+                st.plotly_chart(heatmap_fig)
 
                 st.subheader("Strong Correlations (|corr| > 0.7)")
 
@@ -726,6 +738,49 @@ elif page == "Upload & Explore Data":
                 st.warning("Not enough data to compute correlation.")
         else:
             st.warning("Need at least 2 numeric columns for correlation.")
+            
+        # =========================
+        # DOWNLOAD ALL CHARTS (ZIP)
+        # =========================
+
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, "w") as z:
+
+            # Histogram
+            if 'hist_fig' in locals():
+                try:
+                    buf = io.BytesIO()
+                    hist_fig.savefig(buf, format="png")
+                    buf.seek(0)
+                    z.writestr("histogram.png", buf.read())
+                except:
+                    pass
+
+            # Scatter Plot → HTML
+            if 'scatter_fig' in locals():
+                try:
+                    html_bytes = scatter_fig.to_html().encode("utf-8")
+                    z.writestr("scatter.html", html_bytes)
+                except:
+                    pass
+
+            # Heatmap → HTML
+            if 'heatmap_fig' in locals():
+                try:
+                    html_bytes = heatmap_fig.to_html().encode("utf-8")
+                    z.writestr("heatmap.html", html_bytes)
+                except:
+                    pass
+
+        zip_buffer.seek(0)
+
+        st.download_button(
+            label="Download All Charts (ZIP)",
+            data=zip_buffer,
+            file_name="charts.zip",
+            mime="application/zip"
+        )
 
 
 # AQI PREDICTION

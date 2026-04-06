@@ -11,3 +11,4 @@ statsmodels
 imbalanced-learn
 requests
 openpyxl
+kaleido
