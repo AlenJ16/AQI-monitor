@@ -9,3 +9,5 @@ xgboost
 lightgbm
 statsmodels
 imbalanced-learn
+requests
+openpyxl

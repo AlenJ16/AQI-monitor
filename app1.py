@@ -526,21 +526,112 @@ elif page == "Upload & Explore Data":
         <span class="material-icons" style="color:#5b8dee;font-size:2rem;">upload_file</span>
         Upload &amp; Explore Data</h1>""", unsafe_allow_html=True)
 
-    file = st.file_uploader("Upload CSV", type=["csv"])
+    # ✅ SESSION STATE (IMPORTANT)
+    if "uploaded_df" not in st.session_state:
+        st.session_state.uploaded_df = None
 
+    file = st.file_uploader(
+        "Upload File",
+        type=["csv", "xlsx", "json"],
+        key="upload_file_main"
+    )
+
+    drive_link = st.text_input("Or paste Google Drive file link And Press Enter")
+
+    # 🔧 FIXED DRIVE LINK
+    def convert_drive_link(link):
+        import re
+
+        match = re.search(r"/d/([a-zA-Z0-9_-]+)", link)
+        if match:
+            file_id = match.group(1)
+            return f"https://drive.google.com/uc?export=download&id={file_id}"
+
+        if "spreadsheets" in link:
+            match = re.search(r"/d/([a-zA-Z0-9_-]+)", link)
+            if match:
+                file_id = match.group(1)
+                return f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx"
+
+        return None
+
+    # -------- FILE UPLOAD --------
     if file:
-        df = pd.read_csv(file)
+        file_type = file.name.split(".")[-1].lower()
 
-        # cleaning
+        if file_type == "csv":
+            st.session_state.uploaded_df = pd.read_csv(file)
+
+        elif file_type == "xlsx":
+            st.session_state.uploaded_df = pd.read_excel(file)
+
+        elif file_type == "json":
+            df = pd.read_json(file)
+            if isinstance(df.iloc[0], dict):
+                df = pd.json_normalize(df)
+            st.session_state.uploaded_df = df
+
+        st.success(f"{file_type.upper()} file loaded successfully")
+
+    # -------- GOOGLE DRIVE --------
+    elif drive_link:
+        download_link = convert_drive_link(drive_link)
+
+        if download_link:
+            try:
+                import requests
+                from io import BytesIO
+
+                response = requests.get(download_link)
+                file_bytes = BytesIO(response.content)
+
+                # Try CSV
+                try:
+                    st.session_state.uploaded_df = pd.read_csv(file_bytes)
+                    st.success("Loaded CSV from Google Drive")
+
+                except:
+                    file_bytes.seek(0)
+                    try:
+                        st.session_state.uploaded_df = pd.read_excel(file_bytes)
+                        st.success("Loaded Excel from Google Drive")
+
+                    except:
+                        file_bytes.seek(0)
+                        try:
+                            df = pd.read_json(file_bytes)
+
+                            if isinstance(df.iloc[0], dict):
+                                df = pd.json_normalize(df)
+
+                            st.session_state.uploaded_df = df
+                            st.success("Loaded JSON from Google Drive")
+
+                        except:
+                            st.error("Could not detect file format")
+
+            except Exception as e:
+                st.error(f"Drive load failed: {e}")
+
+        else:
+            st.error("Invalid Google Drive link")
+
+    # -------- MAIN DISPLAY --------
+    df = st.session_state.uploaded_df
+
+    if df is None:
+        st.info("Upload a file or paste a Google Drive link to begin.")
+    
+    elif df is not None:
+
         df = df.replace(r'^\s*$', np.nan, regex=True)
         df = df.dropna()
 
         st.dataframe(df.head())
 
-        # 👉 FILTER STARTS HERE (IMPORTANT)
         col = st.sidebar.selectbox("Filter Column", df.columns)
 
-        if pd.api.types.is_numeric_dtype(df[col]):       
+        if pd.api.types.is_numeric_dtype(df[col]):
             df[col] = pd.to_numeric(df[col], errors='coerce')
             clean_df = df.dropna(subset=[col])
 
@@ -551,14 +642,9 @@ elif page == "Upload & Explore Data":
                 min_val = float(clean_df[col].min())
                 max_val = float(clean_df[col].max())
 
-                if np.isnan(min_val) or np.isnan(max_val):
-                    st.warning(f"Invalid values in column '{col}'")
-                    filtered_df = df.iloc[0:0]
-
-                elif min_val == max_val:
+                if min_val == max_val:
                     val = st.sidebar.number_input("Value", value=min_val)
                     filtered_df = clean_df[clean_df[col] == val]
-
                 else:
                     val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
                     filtered_df = clean_df[
@@ -568,13 +654,12 @@ elif page == "Upload & Explore Data":
             val = st.sidebar.selectbox("Value", df[col].unique())
             filtered_df = df[df[col] == val]
 
-        # 👉 USE filtered_df BELOW
         st.subheader("Filtered Data")
         st.dataframe(filtered_df)
-
+        
         num_cols = filtered_df.select_dtypes(include=np.number).columns
 
-        # histogram graph
+        # Histogram
         if len(num_cols) > 0:
             c = st.selectbox("Histogram Column", num_cols)
             clean = filtered_df[c].dropna()
@@ -583,18 +668,17 @@ elif page == "Upload & Explore Data":
             ax.hist(clean)
             st.pyplot(fig)
 
-        # Scatter plot graph
+        # Scatter Plot
         if len(num_cols) >= 2:
             x = st.selectbox("X", num_cols)
             y = st.selectbox("Y", [i for i in num_cols if i != x])
 
-            plot_df = filtered_df[[x,y]].dropna()
-
+            plot_df = filtered_df[[x, y]].dropna()
             fig = px.scatter(plot_df, x=x, y=y)
             st.plotly_chart(fig)
 
-        # Correlation map with tables and insight
-        st.subheader(" Correlation Heatmap")
+        # Correlation Heatmap
+        st.subheader("Correlation Heatmap")
 
         if len(num_cols) > 1:
             corr_df = filtered_df[num_cols].replace([np.inf, -np.inf], np.nan)
@@ -602,7 +686,6 @@ elif page == "Upload & Explore Data":
             if corr_df.shape[0] > 1:
                 corr_matrix = corr_df.corr()
 
-                # heatmap
                 fig_corr = px.imshow(
                     corr_matrix,
                     text_auto=True,
@@ -612,8 +695,7 @@ elif page == "Upload & Explore Data":
                 )
                 st.plotly_chart(fig_corr)
 
-                # table showing stronger correlation
-                st.subheader(" Strong Correlations (|corr| > 0.7)")
+                st.subheader("Strong Correlations (|corr| > 0.7)")
 
                 strong_corr = (
                     corr_matrix.abs()
