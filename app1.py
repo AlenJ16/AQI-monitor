@@ -58,19 +58,45 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid var(--border) !important;
 }
 section[data-testid="stSidebar"] * { color: var(--text-hi) !important; }
+section[data-testid="stSidebar"] .stRadio > label {
+    margin-bottom: 10px !important;
+    display: block !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--text-lo) !important;
+}
+section[data-testid="stSidebar"] .stRadio > div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+}
 section[data-testid="stSidebar"] .stRadio label {
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 7px 13px;
-    margin: 3px 0;
+    padding: 10px 13px !important;
+    margin: 0 !important;
     transition: all 0.18s ease;
     cursor: pointer;
-    display: block;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 44px !important;
     background: transparent;
 }
 section[data-testid="stSidebar"] .stRadio label:hover {
     border-color: var(--accent);
     background: rgba(91,141,238,0.10);
+}
+section[data-testid="stSidebar"] .stRadio label p {
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
 }
 
 .main .block-container {
@@ -331,7 +357,8 @@ hr { border-color: var(--border) !important; }
         max-width: 80vw !important;
     }
     section[data-testid="stSidebar"] .stRadio label {
-        padding: 9px 13px !important;
+        padding: 10px 13px !important;
+        min-height: 44px !important;
         font-size: 0.9rem !important;
     }
 
