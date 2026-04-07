@@ -12,3 +12,6 @@ imbalanced-learn
 requests
 openpyxl
 kaleido
+folium
+streamlit-folium
+geopy

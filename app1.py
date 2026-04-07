@@ -8,6 +8,9 @@ import plotly.graph_objects as go
 import datetime
 import zipfile
 import io
+import folium
+from streamlit_folium import folium_static
+from geopy.geocoders import Nominatim
 
 # page config 
 st.set_page_config(page_title="AQI Monitor", layout="wide", page_icon="🌫")
@@ -440,7 +443,7 @@ PLOTLY_LAYOUT = dict(
 st.sidebar.markdown('<div class="sidebar-title">🌫 AQI MONITOR</div>', unsafe_allow_html=True)
 page = st.sidebar.radio(
     "Navigate",
-    ["Home", "Upload & Explore Data", "AQI Prediction", "Model Logs"],
+    ["Home", "Upload & Explore Data", "AQI Prediction", "Live AQI Map", "Model Logs"],
     label_visibility="collapsed"
 )
 st.sidebar.markdown("---")
@@ -546,6 +549,77 @@ Higher values = worse air quality.
                      "Use air purifiers indoors", "Reduce vehicle usage",
                      "Support green initiatives"]:
             st.markdown(f"- {item}")
+
+
+# LIVE AQI MAP
+elif page == "Live AQI Map":
+    st.markdown("""<h1 style="display:flex;align-items:center;gap:10px;">
+        <span class="material-icons" style="color:#5b8dee;font-size:2rem;">map</span>
+        Live AQI Map</h1>""", unsafe_allow_html=True)
+    
+    st.markdown("<p style='color:#a0a8c8;'>Search for any city to see current air quality levels from real-world monitoring stations.</p>", unsafe_allow_html=True)
+
+    # Search Bar Row
+    search_col, btn_col = st.columns([4, 1])
+    with search_col:
+        location_input = st.text_input("Enter Area or City Name", placeholder="e.g. New Delhi, Tokyo, London", label_visibility="collapsed")
+    with btn_col:
+        search_btn = st.button("🔍 Search Area", use_container_width=True)
+
+    # Default location: New Delhi
+    lat, lon, zoom = 28.6139, 77.2090, 10
+
+    if (search_btn or location_input) and location_input:
+        try:
+            geolocator = Nominatim(user_agent="aqi_monitor_app")
+            location = geolocator.geocode(location_input)
+            if location:
+                lat, lon, zoom = location.latitude, location.longitude, 12
+                add_log(f"Map updated to: {location_input}", "success")
+            else:
+                st.error("Location not found. Please try a more specific area name.")
+        except Exception as e:
+            st.error(f"Search failed: {e}")
+
+    # Map Creation
+    m = folium.Map(location=[lat, lon], zoom_start=zoom, tiles="cartodbdark_matter")
+    
+    # Live WAQI Data Tile Layer with real token
+    waqi_token = "6b760baec44934c836175e08cc466b86e53ef024"
+    waqi_url = f"https://tiles.waqi.info/tiles/usepa-aqi/{{z}}/{{x}}/{{y}}.png?token={waqi_token}"
+    
+    folium.TileLayer(
+        tiles=waqi_url,
+        attr="Air Quality Data © waqi.info",
+        name="Real-time AQI Station Markers",
+        overlay=True,
+        control=True
+    ).add_to(m)
+
+    folium.LayerControl().add_to(m)
+
+    # Display Map in Streamlit
+    folium_static(m, width=1200, height=550)
+
+    st.markdown("""
+    <div style="display:flex; flex-wrap:wrap; gap:10px; margin:12px 0 8px 0;">
+        <span style="background:#00c96e22; border:1px solid #00c96e; border-radius:20px;
+                     padding:4px 14px; font-size:0.78rem; color:#00c96e; font-weight:600;">● 0–50 Good</span>
+        <span style="background:#f5c51822; border:1px solid #f5c518; border-radius:20px;
+                     padding:4px 14px; font-size:0.78rem; color:#f5c518; font-weight:600;">● 51–100 Moderate</span>
+        <span style="background:#FF8C0022; border:1px solid #FF8C00; border-radius:20px;
+                     padding:4px 14px; font-size:0.78rem; color:#FF8C00; font-weight:600;">● 101–150 Unhealthy*</span>
+        <span style="background:#e0313122; border:1px solid #e03131; border-radius:20px;
+                     padding:4px 14px; font-size:0.78rem; color:#e03131; font-weight:600;">● 151–200 Unhealthy</span>
+        <span style="background:#9b59b622; border:1px solid #9b59b6; border-radius:20px;
+                     padding:4px 14px; font-size:0.78rem; color:#9b59b6; font-weight:600;">● 201–300 Very Unhealthy</span>
+        <span style="background:#7d1b1b22; border:1px solid #7d1b1b; border-radius:20px;
+                     padding:4px 14px; font-size:0.78rem; color:#ff6b6b; font-weight:600;">● 300+ Hazardous</span>
+    </div>
+    <p style="color:#6b7196; font-size:0.75rem; margin-top:4px;">
+    Data source: <a href="https://waqi.info" style="color:#5b8dee;">World Air Quality Index (WAQI)</a> · Real-time monitoring stations · Zoom in for more detail.
+    </p>
+    """, unsafe_allow_html=True)
 
 
 # UPLOAD & EXPLORE
@@ -695,9 +769,9 @@ elif page == "Upload & Explore Data":
                     filtered_df = clean_df[clean_df[col] == val]
                 else:
                     val = st.sidebar.slider("Range", min_val, max_val, (min_val, max_val))
-                    filtered_df = clean_df[
+                    filtered_df = clean_df(
                         (clean_df[col] >= val[0]) & (clean_df[col] <= val[1])
-                    ]
+                    )
         else:
             val = st.sidebar.selectbox("Value", df[col].unique())
             filtered_df = df[df[col] == val]
